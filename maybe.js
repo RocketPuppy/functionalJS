@@ -84,6 +84,28 @@ Maybe.prototype.fmap = function(f){
         return Maybe.Nothing;
     }
 };
+
+/*
+ * The functor laws
+ * First: identity - fmap(id) = id
+ * Case 1: Nothing
+ * 1. Nothing.fmap(id) == Nothing
+ * 2. Nothing == Nothing    //fmap simplifies to Nothing
+ * Case 2: Just(x)
+ * 1. Just(x).fmap(id) == Just(x)
+ * 2. Just(id(x)) == Just(x)    //fmap simplifies
+ * 3. Just(x) == Just(x)        //id simplifies
+ *
+ * Second: Distributive - fmap (f.c(g)) == (fmap(g)).fmap(f)
+ * Case 1: Nothing
+ * 1. Nothing.fmap(f.c(g)) == Nothing.fmap(g).fmap(f)
+ * 2. Nothing == Nothing.fmap(f)    //fmap simplifies
+ * 3. Nothing == Nothing            //fmap simplifies
+ * Case 2: Just(x)
+ * 1. Just(x).fmap(f.c(g)) == Just(x).fmap(g).fmap(f)
+ * 2. Just(f.c(g)(x)) == Just(g(x)).fmap(f)
+ * 3. Just(f(g(x))) == Just(f(g(x)))
+ */
 /*
  * The Just subclass of Maybe. It contains a single value.
  */
