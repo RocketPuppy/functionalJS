@@ -21,6 +21,16 @@ function curry(fn, args){
 }
 
 /*
+ * Function composition
+ */
+Function.prototype.c = function(g){
+    var f = this;
+    return function(x){
+        return f(g(x));
+    };
+};
+
+/*
  * The id function, it returns whatever is passed into it.
  */
 function id(x){
