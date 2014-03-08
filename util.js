@@ -32,6 +32,18 @@ Function.prototype.$ = function(){
 }
 
 /*
+ * Function application operator
+ */
+Function.$ = function(){
+    var args = Array.prototype.slice.call(arguments);
+    return function(f){
+        return args.reduce(function(acc, v){
+            return acc.$(v);
+        }, f.$());
+    };
+};
+
+/*
  * Flip the arguments of a binary function
  */
 Function.prototype.flip = function(){
