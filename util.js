@@ -8,9 +8,9 @@
  * The big advantage to currying is that we can partially apply functions.
  */
 function curry(fn, args){
-    args = args || [];
+    var oldargs = args || [];
     return function(x){
-        args = args.concat([x]);
+        var args = oldargs.concat([x]);
         if(args.length === fn.length){
             return fn.apply(null, args);
         }
