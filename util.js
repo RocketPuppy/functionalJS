@@ -21,12 +21,23 @@ function curry(fn, args){
 }
 
 /*
+ * Seamless partial function application.
+ */
+Function.prototype.$ = function(){
+    var f = curry(this);
+    var args = Array.prototype.slice.call(arguments);
+    return args.reduce(function(acc, v){
+        return acc(v);
+    }, f);
+}
+
+/*
  * Function composition
  */
 Function.prototype.c = function(g){
     var f = this;
     return function(x){
-        return f(g(x));
+        return f.$(g.$(x));
     };
 };
 
