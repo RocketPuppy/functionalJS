@@ -32,6 +32,16 @@ Function.prototype.$ = function(){
 }
 
 /*
+ * Flip the arguments of a binary function
+ */
+Function.prototype.flip = function(){
+    var f = this;
+    return function(x, y){
+        return f.$(y, x);
+    };
+};
+
+/*
  * Function composition
  */
 Function.prototype.c = function(g){
