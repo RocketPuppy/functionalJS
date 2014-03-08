@@ -16,7 +16,7 @@ Maybe.prototype = new MonadPlus();
  */
 Maybe.prototype.pass = function(f){
     if(this instanceof Just){
-        return f(this.val);
+        return f.$(this.val);
     }
     else if(this instanceof Nothing){
         return Maybe.Nothing;
@@ -78,7 +78,7 @@ Maybe.prototype.mplus = function(m){
 //TODO reimplement this when I get to applicatives
 Maybe.prototype.fmap = function(f){
     if(this instanceof Just){
-        return new Just(f(this.val));
+        return new Just(f.$(this.val));
     }
     else if(this instanceof Nothing){
         return Maybe.Nothing;
@@ -130,50 +130,40 @@ Maybe.Nothing = new Nothing();
  * Nothing if its argument is 0, short-circuiting the rest of the chain and
  * preventing an exception.
  */
-function safeDiv(num){
-    return function(denom){
-        if(denom != 0){
-            return new Just(num/denom);
-        }
-        else{
-            return Maybe.Nothing
-        }
+function safeDivM(num, denom){
+    if(denom != 0){
+        return new Just(num/denom);
+    }
+    else{
+        return Maybe.Nothing
     }
 }
 
-onlyEven = function(x){
-    if(x % 2 === 0){
-        return new Just(x);
-    }
-    else{
-        return Maybe.Nothing;
-    }
+//monadic math functions
+plusM = function(x, y){
+    return new Just(x + y);
 };
-onlyOdd = function(x){
-    if(x % 2 === 0){
-        return Maybe.Nothing;
-    }
-    else{
-        return new Just(x);
-    }
+minusM = function(x, y){
+    return new Just(x - y);
+};
+multM = function(x, y){
+    return new Just(x * y);
 };
 
-plus = function(x){
-    return function(y){
-        return y + x;
-    }
+//non-monadic math functions
+plus = function(x, y){
+    return (x + y);
 };
-minus = function(x){
-    return function(y){
-        return y - x;
-    }
+minus = function(x, y){
+    return (x - y);
 };
-mult = function(x){
-    return function(y){
-        return y * x;
-    }
+mult = function(x, y){
+    return (x * y);
 };
-usage1 = function(x){return (new Just(x)).pass(function(x){ return new Just(x + 20)}).pass(function(x) {return new Just(x * 4)}).pass(safeDiv(62345)).pass(function(x){ return new Just(x - 4)})}
+
+usage1 = function(x){
+    return (new Just(x)).pass(plusM.$(20)).pass(multM.$(4)).pass(safeDivM.$(5)).pass(minusM.$(4));
+};
 usage2 = function(x){
-    return (new Just(x)).liftM(plus(20)).liftM(mult(4)).pass(safeDiv(62345)).liftM(minus(4))
+    return (new Just(x)).liftM(plus.$(20)).liftM(mult.$(4)).pass(safeDivM.$(5)).liftM(minus.$(4))
 }
