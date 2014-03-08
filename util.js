@@ -9,9 +9,10 @@
  */
 function curry(fn, args){
     var oldargs = args || [];
-    return function(x){
-        var args = oldargs.concat([x]);
-        if(args.length === fn.length){
+    return function(){
+        //only get the first arg, if any
+        var args = oldargs.concat(Array.prototype.slice.call(arguments, 0, 1));
+        if(args.length === fn.length || fn.length === 0){
             return fn.apply(null, args);
         }
         else{
@@ -28,7 +29,7 @@ Function.prototype.$ = function(){
     var args = Array.prototype.slice.call(arguments);
     return args.reduce(function(acc, v){
         return acc(v);
-    }, f);
+    }, f());
 }
 
 /*
