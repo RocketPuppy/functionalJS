@@ -96,7 +96,7 @@ Maybe.prototype.fmap = function(f){
  * 2. Just(id(x)) == Just(x)    //fmap simplifies
  * 3. Just(x) == Just(x)        //id simplifies
  *
- * Second: Distributive - fmap (f.c(g)) == (fmap(g)).fmap(f)
+ * Second: Distributive - m.fmap(f.c(g)) == m.(fmap(g)).fmap(f)
  * Case 1: Nothing
  * 1. Nothing.fmap(f.c(g)) == Nothing.fmap(g).fmap(f)
  * 2. Nothing == Nothing.fmap(f)    //fmap simplifies
