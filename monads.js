@@ -1,43 +1,41 @@
 /*
- * A monadic function is one which can be used with the bind (pass) function.
- * We can define lifting functions to lift non-monadic functions "into" a monad
- * so they can be used with it. These can extend to any arity (here we go up to
- * binary functions), or we can use the `ap` function to apply a non-monadic
- * function partially to its arguments, like so:
- *   plus(x, y, z)
- *   new Just(plus).ap(new Just(1)).ap(new Just(2)).ap(new Just(3)) = Just 6
- * Of course this obeys all of the monad rules as well, so a Nothing in the
- * list of arguments will short-circuit.
+ * The Monad class
+ * 
+ * Each instance of a Monad must follow one of two sets of laws. Both sets are
+ * equivalent, but use different formulations of the laws.
+ * Set 1:
+ * 1. join . fmap join == join . join
+ * 1. M.join.c(M.join.fmap) == M.join.c(M.join)
  */
 function Monad(){};
-Monad.prototype = new Functor();
-Monad.prototype.liftM = function(f){
-    self = this;
-    return self.pass(function(x){
-        return self.ret(f(x));
-    });
-};
+Monad.prototype = new Applicative();
 
-Monad.prototype.liftM2 = function(f, m2){
-    self = this;
-    return self.pass(function(x){
-        return m2.pass(function(y){
-            return self.ret(f(x, y))
-        });
-    });
+/*
+ * Note that you must implement either join or pass in the object
+ * you wish to be a monad. If you fail to implement either then calling one
+ * will result in an infinite recursion.
+ *
+ * `join` - called on a monad, removes one level of monadic structure
+ * `pass` - called on a monad with a function as an argument, it applies that
+ * function to the value contained in the monad. The function given must take
+ * as an argument a value of the same type contained in the monad, and return
+ * a new instance of the monad.
+ */
+Monad.prototype.join = function(){
+    return this.pass(id);
 };
-
-Monad.prototype.ap = function(m){
-    self = this;
-    return self.pass(function(f){
-        return m.pass(function(x){
-            return self.ret(curry(f)(x))
-        });
-    });
+Monad.join = function(x){
+    return x.join();
+};
+Monad.prototype.pass = function(f){
+    return this.fmap(f).join();
+};
+Monad.pass = function(f, x){
+    return x.pass(f);
 };
 
 /*
- * This is like bind (pass) except it doesn't use the argument in the function
+ * This is like pass except it doesn't use the argument in the function
  * given to bind. It's purpose is to (seq)uence two monadic actions together.
  */
 Monad.prototype.seq = function(m){
@@ -45,23 +43,4 @@ Monad.prototype.seq = function(m){
     return self.pass(function(){
         return m;
     });
-}
-
-/*
- * The join operation is used to remove a level of monadic structure. E.g.
- * `Just( Just(1) ).join()` would return `Just(1)`
- */
-Monad.prototype.join = function(){
-    return this.pass(id);
 };
-
-/*
- * MonadPlus offers two new operations "mzero" and "mplus" to use on monads.
- * `mzero` must follow the following identity laws:
- * mzero.bind(f) == mzero
- * m.seq(mzero) == mzero
- *
- * `mplus` must be associative
- */
-function MonadPlus(){}
-MonadPlus.prototype = new Monad();

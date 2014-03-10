@@ -21,6 +21,24 @@ function curry(fn, args){
     }
 }
 
+function curry(fn){
+    if(fn.length === 1){
+        return function(x){
+            return fn(x);
+        }
+    }
+    if(fn.length === 2){
+        return function(x){
+            return curry(fn, x);
+        };
+        return function(x){
+            return function(y){
+                return fn(x, y);
+            }
+        }
+    }
+}
+
 /*
  * Seamless partial function application.
  */
@@ -30,7 +48,7 @@ Function.prototype.$ = function(){
     return args.reduce(function(acc, v){
         return acc(v);
     }, f());
-}
+};
 
 /*
  * Function application operator
@@ -57,6 +75,12 @@ Function.prototype.flip = function(){
 /*
  * Function composition
  */
+Function.c = function(f, g){
+    return function(x){
+        return f.$(g.$(x))
+    }
+};
+
 Function.prototype.c = function(g){
     var f = this;
     return function(x){
