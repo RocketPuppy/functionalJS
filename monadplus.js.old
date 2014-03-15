@@ -1,0 +1,10 @@
+/*
+ * MonadPlus offers two new operations "mzero" and "mplus" to use on monads.
+ * `mzero` must follow the following identity laws:
+ * mzero.bind(f) == mzero
+ * m.seq(mzero) == mzero
+ *
+ * `mplus` must be associative
+ */
+function MonadPlus(){}
+MonadPlus.prototype = new Monad();
