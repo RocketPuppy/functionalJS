@@ -19,35 +19,35 @@ class _Maybe extends MonadPlus
             super()
 
     class Nothing extends _Maybe
+    @Nothing: new Nothing()
+
+    $$ = (f, v) =>
+        if f instanceof Just && v instanceof Just
+            new Just(f.val.$(v.val))
+        else if f instanceof Nothing || v instanceof Nothing
+            return Maybe.Nothing
+
+    pure = (x) ->
+        new Just(x)
+    @pure = pure
+
+    join = (x) ->
+        if x instanceof Just && x.val instanceof _Maybe
+            x.val
+        else if x instanceof Nothing
+            return x
+
+    mzero = -> Maybe.Nothing
+    @mzero = mzero
+
+    mplus = (m1, m2) ->
+        if m1 instanceof Just
+            m1
+        else if m1 instanceof Nothing
+            m2
 
     constructor: () ->
-        $$ = (f, v) =>
-            if f instanceof Just && v instanceof Just
-                new Just(f.val.$(v.val))
-            else if f instanceof Nothing || v instanceof Nothing
-                return Maybe.Nothing
-
-        pure = (x) ->
-            new Just(x)
-        _Maybe.pure = pure
-
-        join = (x) ->
-            if x instanceof Just && x.val instanceof _Maybe
-                x.val
-            else if x instanceof Nothing
-                return x
-
-        mzero = -> Maybe.Nothing
-        _Maybe.mzero = mzero
-
-        mplus = (m1, m2) ->
-            if m1 instanceof Just
-                m1
-            else if m1 instanceof Nothing
-                m2
         super(mzero, mplus, join, undefined, pure, $$)
-
-    @Nothing: new Nothing()
 
 class @Maybe
     @pure: _Maybe.pure
