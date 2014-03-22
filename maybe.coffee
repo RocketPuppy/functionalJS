@@ -46,6 +46,12 @@ class _Maybe extends MonadPlus
         else if m1 instanceof Nothing
             m2
 
+    isJust: => this instanceof Just
+    isNothing: => this instanceof Nothing
+
+    @isJust: (m) -> m.isJust()
+    @isNothing: (m) -> m.isNothing()
+
     constructor: () ->
         super(mzero, mplus, join, undefined, pure, $$)
 
@@ -53,6 +59,8 @@ class @Maybe
     @pure: _Maybe.pure
     @mzero: _Maybe.mzero
     @Nothing: _Maybe.Nothing
+    @isJust: _Maybe.isJust
+    @isNothing: _Maybe.isNothing
 
 # Functor laws proof
 #
