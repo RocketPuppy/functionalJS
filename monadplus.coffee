@@ -3,11 +3,11 @@
 # implement Monad as well.
 
 class @MonadPlus extends Monad
-    constructor: (mzero, mplus, join, pass, pure, $$, fmap) ->
+    constructor: (context, mzero, mplus, join, pass, pure, $$, fmap) ->
         @mzero = mzero
-        @mplus = (m2) =>
-            mplus(this, m2)
-        super(join, pass, pure, $$, fmap)
+        @mplus = (m2) ->
+            mplus(context, m2)
+        super(context, join, pass, pure, $$, fmap)
 
     @mzero: (m) ->
         m.mzero()

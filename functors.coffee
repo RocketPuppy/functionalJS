@@ -7,9 +7,9 @@
 # functor laws
 
 class @Functor
-    constructor: (fmap) ->
-        @fmap = (f) =>
-            fmap(f, this)
+    constructor: (context, fmap) ->
+        @fmap = (f) ->
+            fmap(f, context)
 
     @fmap: (f, x) ->
         x.fmap(f)
@@ -21,11 +21,11 @@ class @Functor
 # and `pure` according to the Applicative laws. Classes **may** also implement
 # `fmap` to override the default with a more efficient version.
 class @Applicative extends Functor
-    constructor: (pure, $$, fmap) ->
-        @$$ = (v) =>
-            $$(this, v)
+    constructor: (context, pure, $$, fmap) ->
+        @$$ = (v) ->
+            $$(context, v)
         @pure = pure
         if !fmap?
-            fmap = (f, x) =>
-                @pure(f).$$(x)
-        super(fmap)
+            fmap = (f, x) ->
+                context.pure(f).$$(x)
+        super(context, fmap)

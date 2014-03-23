@@ -13,14 +13,7 @@
 # values that are of the Maybe type. In cases where they receive arguments that
 # don't satisfy that, the behavior should be undefined.
 
-class _Maybe extends MonadPlus
-    class Just extends _Maybe
-        constructor: (@val) ->
-            super()
-
-    class Nothing extends _Maybe
-    @Nothing: new Nothing()
-
+class _Maybe extends Module
     $$ = (f, v) =>
         if f instanceof Just && v instanceof Just
             new Just(f.val.$(v.val))
@@ -52,15 +45,54 @@ class _Maybe extends MonadPlus
     @isJust: (m) -> m.isJust()
     @isNothing: (m) -> m.isNothing()
 
+    @extend(MonadPlus)
+    @extend(Monoid)
+
+    class Just extends _Maybe
+        constructor: (@val) ->
+            super()
+
+    class Nothing extends _Maybe
+    @Nothing: new Nothing()
+
+    # Monoid instance, lift a wrapped monoid into a maybe
+    mempty = _Maybe.Nothing
+    combine = (l, r) ->
+        if l instanceof Nothing || r instanceof Nothing
+            if l instanceof Just
+                l
+            else
+                r
+        else
+            Maybe.pure(l.val.combine(r.val))
+
     constructor: () ->
-        super(mzero, mplus, join, undefined, pure, $$)
+        monadp = new MonadPlus(this, mzero, mplus, join, undefined, pure, $$)
+        monoid = new Monoid(this, mempty, combine)
+        this.include(monadp)
+        this.include(monoid)
 
 class @Maybe
     @pure: _Maybe.pure
     @mzero: _Maybe.mzero
+    @mempty: _Maybe.mempty
     @Nothing: _Maybe.Nothing
     @isJust: _Maybe.isJust
     @isNothing: _Maybe.isNothing
+
+class @LastMonoid extends Module
+    mempty = () -> new Last(Maybe.Nothing)
+    combine = (l, r) ->
+        if r.val.isJust()
+            r
+        else
+            l
+
+    @mempty = mempty
+
+    constructor: (@val) ->
+        monoid = new Monoid(this, mempty, combine)
+        this.include(monoid)
 
 # Functor laws proof
 #
