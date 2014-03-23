@@ -8,11 +8,12 @@
 Function.curry = (fn, args) ->
     oldargs = args || []
     (x)->
-      oldargs.push(x)
-      if oldargs.length is fn.length || fn.length is 0
-          fn.apply(fn, oldargs)
+      args = oldargs.slice(0)
+      args[args.length] = x
+      if args.length is fn.length || fn.length is 0
+          fn.apply(fn, args)
       else
-          Function.curry(fn, oldargs)
+          Function.curry(fn, args)
 
 # Seamless partial function application
 Function.prototype.$ = (args...) ->
